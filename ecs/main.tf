@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "task" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   container_definitions    = jsonencode([{
     name          = var.app_name
-    image         = "438465157882.dkr.ecr.af-south-1.amazonaws.com/samas"
+    image         = "438465157882.dkr.ecr.af-south-1.amazonaws.com/qr_code"
     essential     = true
     portMappings  = [
       {
