@@ -67,7 +67,7 @@ jobs:
         working-directory: ./ecs
 
       # Optional: uncomment if you want to destroy after
-      # - name: 🧹 Terraform Destroy (Optional)
-      #   if: ${{ always() }}
-      #   run: terraform destroy -auto-approve
-      #   working-directory: ./ecs
+      - name: 🧹 Terraform Destroy (Optional)
+        if: ${{ always() }}
+        run: terraform destroy -auto-approve
+        working-directory: ./ecs
