@@ -1,20 +1,20 @@
-# Use Node 18 Alpine version
+# Use Node 18 Alpine
 FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json from the "QR Code generator" folder
-COPY "QR Code generator/package*.json" ./
+# Copy package.json and package-lock.json
+COPY QR\ Code\ Generator/package*.json ./
 
-# Install app dependencies
+# Install dependencies
 RUN npm install
 
-# Copy the rest of your app code
-COPY "QR Code generator/" ./
+# Copy rest of the app
+COPY QR\ Code\ Generator/ ./
 
-# Expose the app port (change if needed)
+# Expose port (example)
 EXPOSE 3000
 
-# Run the app
+# Start the app
 CMD ["npm", "start"]
