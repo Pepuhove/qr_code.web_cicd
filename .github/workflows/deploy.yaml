@@ -1,0 +1,67 @@
+name: deploy-to-ECS
+
+on: 
+  workflow_run:
+    workflows: ["build->push->ecr"]
+    types:
+      - completed
+  push:
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v2
+
+      - name: ⚙️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: 🔐 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: 🔐 Log in to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: 'private'
+          mask-password: true
+
+      - name: 🐳 Build, Tag, and Push Docker Image to ECR
+        run: |
+          REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          REPOSITORY=${{ secrets.REPOSITORY }}
+          IMAGE_TAG=${{ secrets.IMAGE_TAG }}
+
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+  terraform:
+    needs: deploy    # wait until deploy job finishes
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v2
+
+      - name: 📦 Download Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.0
+
+      - name: ⚙️ Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: 🚀 Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: ./terraform
+
+      - name: 🧹 Terraform Destroy (Optional)
+        if: ${{ always() }}
+        run: terraform destroy -auto-approve
+        working-directory: ./terraform

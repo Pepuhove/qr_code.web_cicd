@@ -1,0 +1,24 @@
+{
+  "name": "node-projects",
+  "version": "1.0.0",
+  "description": "creating a qr code generator and will be using inquirer(this will take input from the user) as a package and qr-image as it will generate images as a png for us to save into our local file system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/garikai94/Wed-Development.git"
+  },
+  "author": "Garikai Tafadzwa Matanhatu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/garikai94/Wed-Development/issues"
+  },
+  "homepage": "https://github.com/garikai94/Wed-Development#readme",
+  "type":"module",
+  "dependencies": {
+    "inquirer": "^9.2.23",
+    "qr-image": "^3.2.0"
+  }
+}
