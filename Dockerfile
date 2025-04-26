@@ -1,19 +1,20 @@
+# Use Node 18 Alpine version
 FROM node:18-alpine
 
-# Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy only package.json and package-lock.json first (for layer caching)
-COPY package*.json ./
+# Copy package.json and package-lock.json from the "QR Code generator" folder
+COPY "QR Code generator/package*.json" ./
 
-# Install dependencies inside the container
+# Install app dependencies
 RUN npm install
 
-# Now copy the rest of your app's code
-COPY . .
+# Copy the rest of your app code
+COPY "QR Code generator/" ./
 
-# Expose port 3000 (assuming your app runs there)
+# Expose the app port (change if needed)
 EXPOSE 3000
 
-# Start your Node.js app
+# Run the app
 CMD ["npm", "start"]
