@@ -14,3 +14,7 @@ variable "subnet_ids" {
   description = "A list of subnet IDs for the ECS service"
   type        = list(string)
 }
+variable "region" {
+  default     = "af-south-1"
+  description = "AWS Region to deploy resources."
+}
