@@ -1,9 +1,9 @@
 name: build->push->ecr
 
 on:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
 jobs:
   sonar:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Changed to v4
         with:
           fetch-depth: 0
 
@@ -27,14 +27,13 @@ jobs:
     needs: sonar
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Changed to v4
 
       - name: Gitleaks Installation
-        run: sudo apt install gitleaks -y
+        run: sudo apt-get update && sudo apt-get install -y gitleaks  # safer apt-get
 
       - name: 🛡️ Run Gitleaks scan
         run: gitleaks detect --source . --report-path=gitleaks-report.json --report-format json
-      
 
   nodejs:
     name: ⚙️ Node.js Setup and Tests
@@ -50,10 +49,7 @@ jobs:
           node-version: 18
 
       - name: 📦 Install Dependencies
-             # 👈 Move into the correct folder
-        run: | 
-          cd "Requests"
-          npm install
+        run: npm install
 
   docker-build-and-push:
     name: 🐳 Build and Push Docker Image
@@ -61,7 +57,7 @@ jobs:
     needs: [gitleak, nodejs]
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🔐 Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -89,7 +85,7 @@ jobs:
     needs: docker-build-and-push
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 📥 Install Trivy
         run: |
@@ -103,5 +99,3 @@ jobs:
         with:
           name: trivy-fs-report
           path: fs-report.json
-# 
-# 
