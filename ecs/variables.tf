@@ -18,3 +18,7 @@ variable "region" {
   default     = "af-south-1"
   description = "AWS Region to deploy resources."
 }
+
+variable "security_group_ids" {
+  type = list(string)
+}
