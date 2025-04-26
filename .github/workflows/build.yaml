@@ -1,9 +1,9 @@
 name: build->push->ecr
 
 on:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
 jobs:
   sonar:
@@ -52,7 +52,7 @@ jobs:
       - name: 📦 Install Dependencies
              # 👈 Move into the correct folder
         run: | 
-          cd "qr-code-generator"
+          cd "Requests"
           npm install
 
   docker-build-and-push:

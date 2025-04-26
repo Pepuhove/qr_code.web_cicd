@@ -5,13 +5,13 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy package files
-COPY qr-code-generator/package*.json ./
+COPY Requests/package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy rest of the code
-COPY qr-code-generator/ ./
+COPY Requests/ ./
 
 # Expose port (example)
 EXPOSE 3000
