@@ -4,14 +4,14 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY QR\ Code\ Generator/package*.json ./
+# Copy package files
+COPY qr-code-generator/package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy rest of the app
-COPY QR\ Code\ Generator/ ./
+# Copy rest of the code
+COPY qr-code-generator/ ./
 
 # Expose port (example)
 EXPOSE 3000
