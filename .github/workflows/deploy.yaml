@@ -1,15 +1,15 @@
 name: deploy-to-ECS
 
 on: 
-  workflow_run:
-    workflows: ["build->push->ecr"]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["build->push->ecr"]
+  #   types:
+  #     - completed
   push:
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
@@ -55,7 +55,7 @@ jobs:
 
       - name: ⚙️ Terraform Init
         run: terraform init
-        working-directory: ./terraform
+        working-directory: ./ecs
 
       - name: 🚀 Terraform Apply
         run: terraform apply -auto-approve

@@ -1,9 +1,9 @@
 name: build->push->ecr
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   sonar:
