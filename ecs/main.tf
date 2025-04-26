@@ -1,5 +1,3 @@
-
-
 # AWS Provider
 provider "aws" {
   region = var.region
@@ -36,7 +34,7 @@ resource "aws_ecs_cluster" "this" {
 
 # Load Balancer (ALB)
 resource "aws_lb" "this" {
-  name               = "${var.app_name}-lb"
+  name               = replace("${var.app_name}-lb", "_", "-")
   internal           = false
   load_balancer_type = "application"
   security_groups    = var.security_group_ids
@@ -45,11 +43,21 @@ resource "aws_lb" "this" {
 
 # Load Balancer Target Group
 resource "aws_lb_target_group" "this" {
-  name        = "${var.app_name}-tg"
+  name        = substr(replace("${var.app_name}-tg", "_", "-"), 0, 32)
   port        = 3000
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip"
+
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    matcher             = "200-399"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }
 
 # Load Balancer Listener
@@ -75,12 +83,11 @@ resource "aws_ecs_task_definition" "this" {
 
   container_definitions = jsonencode([{
     name  = var.app_name
-    image = "438465157882.dkr.ecr.af-south-1.amazonaws.com/qr_code"
+    image = "438465157882.dkr.ecr.${var.region}.amazonaws.com/${var.app_name}"
     essential = true
     portMappings = [
       {
         containerPort = 3000
-        hostPort      = 3000
         protocol      = "tcp"
       }
     ],
@@ -89,7 +96,7 @@ resource "aws_ecs_task_definition" "this" {
       interval    = 30
       timeout     = 5
       retries     = 3
-      startPeriod = 60
+      startPeriod = 30
     }
   }])
 }
@@ -114,6 +121,8 @@ resource "aws_ecs_service" "this" {
     container_port   = 3000
   }
 
-  depends_on = [aws_lb_listener.this]
+  depends_on = [
+    aws_lb_listener.this,
+    aws_lb_target_group.this
+  ]
 }
-# 
