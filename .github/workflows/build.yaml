@@ -32,8 +32,9 @@ jobs:
       - name: Gitleaks Installation
         run: sudo apt install gitleaks -y
 
-      - name: 🔍 Run Gitleaks Code Scan
-        run: gitleaks detect --source . --report-path=gitleaks-report.json --format json
+      - name: 🛡️ Run Gitleaks scan
+        run: gitleaks detect --source . --report-path=gitleaks-report.json --report-format json
+      
 
   nodejs:
     name: ⚙️ Node.js Setup and Tests
