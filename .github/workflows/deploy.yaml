@@ -59,9 +59,9 @@ jobs:
 
       - name: 🚀 Terraform Apply
         run: terraform apply -auto-approve
-        working-directory: ./terraform
+        working-directory: ./ecs
 
       - name: 🧹 Terraform Destroy (Optional)
         if: ${{ always() }}
         run: terraform destroy -auto-approve
-        working-directory: ./terraform
+        working-directory: ./ecs
