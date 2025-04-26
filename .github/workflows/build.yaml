@@ -49,8 +49,10 @@ jobs:
           node-version: 18
 
       - name: 📦 Install Dependencies
-        run: npm install
-
+             # 👈 Move into the correct folder
+        run: | 
+          cd "QR Code Generator"
+          npm install
   docker-build-and-push:
     name: 🐳 Build and Push Docker Image
     runs-on: ubuntu-latest
