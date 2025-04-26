@@ -52,7 +52,7 @@ jobs:
       - name: 📦 Install Dependencies
              # 👈 Move into the correct folder
         run: | 
-          cd "QR Code Generator"
+          cd "qr-code-generator"
           npm install
   docker-build-and-push:
     name: 🐳 Build and Push Docker Image
