@@ -1,33 +1,27 @@
 name: deploy-to-ECS
 
 on: 
-  # workflow_run:
-  #   workflows: ["build->push->ecr"]
-  #   types:
-  #     - completed
   push:
 
 jobs:
   deploy:
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: ⚙️ Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
 
       - name: 🔐 Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: 🔐 Log in to Amazon ECR
-        id: ecr-login
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           registry-type: 'private'
           mask-password: true
@@ -42,26 +36,38 @@ jobs:
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
   terraform:
-    needs: deploy    # wait until deploy job finishes
+    needs: deploy
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: 📦 Download Terraform
-        uses: hashicorp/setup-terraform@v1
+      - name: 📦 Set up Terraform
+        uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.0.0
+          terraform_version: 1.7.5 # latest stable at the moment
+
+      - name: 🔐 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: ⚙️ Terraform Init
         run: terraform init
+        working-directory: ./ecs
+
+      - name: ✅ Terraform Validate
+        run: terraform validate
         working-directory: ./ecs
 
       - name: 🚀 Terraform Apply
         run: terraform apply -auto-approve
         working-directory: ./ecs
 
-      - name: 🧹 Terraform Destroy (Optional)
-        if: ${{ always() }}
-        run: terraform destroy -auto-approve
-        working-directory: ./ecs
+      # Optional: uncomment if you want to destroy after
+      # - name: 🧹 Terraform Destroy (Optional)
+      #   if: ${{ always() }}
+      #   run: terraform destroy -auto-approve
+      #   working-directory: ./ecs
