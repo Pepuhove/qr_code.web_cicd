@@ -1,20 +1,26 @@
-# Use Node 18 Alpine
-FROM node:18-alpine
+# Build Stage
+FROM node:20-alpine AS builder
 
-# Set working directory
+# Set work directory
 WORKDIR /app
 
-# Copy package files
-COPY Requests/package*.json ./
+# Install only production dependencies
+COPY package*.json ./
+RUN npm install --omit=dev
 
-# Install dependencies
-RUN npm install
+# Copy the rest of the app
+COPY . .
 
-# Copy rest of the code
-COPY Requests/ ./
+# Run app with minimal image
+FROM node:20-alpine
 
-# Expose port (example)
+WORKDIR /app
+
+# Copy node_modules and app files from builder
+COPY --from=builder /app /app
+
+# Expose port
 EXPOSE 3000
 
-# Start the app
-CMD ["npm", "start"]
+# Run the server
+CMD ["node", "index.js"]
